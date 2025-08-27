@@ -1,0 +1,18 @@
+{
+  "Levels": [
+    {
+      "Id": 1,
+      "Layout": { "Rows": 4, "WordLength": 6 },
+      "Words": ["КЛАССЫ", "АКТЁРЫ", "СКЛАДЫ", "РАМКИ"],
+      "Clusters": ["КЛ","АСС","Ы","АК","ТЁ","РЫ","СК","ЛА","ДЫ","РА","МК","И"],
+      "UiOptions": { "ShuffleClusters": true }
+    },
+    {
+      "Id": 2,
+      "Layout": { "Rows": 4, "WordLength": 6 },
+      "Words": ["МОСТЫ","ЛАПША","ТОРТЫ","КРОВЬ"],
+      "Clusters": ["МО","СТЫ","ЛА","ПШ","А","ТО","РТ","Ы","КР","ОВ","Ь"],
+      "UiOptions": { "ShuffleClusters": true }
+    }
+  ]
+}
