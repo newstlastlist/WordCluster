@@ -27,6 +27,7 @@ namespace App
 
             _registry.Register<ILevelRepository>(levelRepo);
             _registry.Register<IProgressService>(progress);
+            _registry.Register<IScreenNavigator>(new ScreenNavigator(_screenController));
 
             _screenController.Show(ScreenId.Main);
         }
