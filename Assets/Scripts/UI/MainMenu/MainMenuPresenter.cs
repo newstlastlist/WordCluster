@@ -8,34 +8,36 @@ namespace UI.MainMenu
     public sealed class MainMenuPresenter
     {
         private readonly MainMenuView _view;
-        private readonly ILevelRepository _levels;
-        private readonly IProgressService _progress;
+        private readonly ILevelRepository _levelRepository;
+        private readonly IProgressService _progressService;
         private readonly IScreenNavigator _screenNavigator;
 
         public MainMenuPresenter(MainMenuView view)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
-            _levels = Services.Get<ILevelRepository>();
-            _progress = Services.Get<IProgressService>();
+            _levelRepository = Services.Get<ILevelRepository>();
+            _progressService = Services.Get<IProgressService>();
             _screenNavigator = Services.Get<IScreenNavigator>();
         }
 
-        public void OnOpen()
+        public void Open()
         {
-            _view.SetTitle("WORD PUZZLE");
-            var completed = _progress.LastCompletedLevelIndex;
-            var total = _levels.Count;
+            _view.PlayClicked += OnPlayClicked;
 
-            string progressText = $"TOTAL PROGRESS: {Math.Max(0, completed + 1)} / {total}";
+            _view.SetTitle("WORD PUZZLE");
+            int completed = Math.Max(0, _progressService.LastCompletedLevelIndex + 1);
+            int total = _levelRepository.Count;
+
+            string progressText = $"Completed: {completed}/{total}";
             _view.SetProgressText(progressText);
         }
 
-        public void OnClose()
+        public void Close()
         {
-            
+            _view.PlayClicked -= OnPlayClicked;
         }
 
-        public void StartGame()
+        private void OnPlayClicked()
         {
             _screenNavigator.Show(ScreenId.Game);
         }

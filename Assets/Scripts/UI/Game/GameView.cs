@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,28 +10,13 @@ namespace UI.Game
         [SerializeField] private TMP_Text _header;
         [SerializeField] private Button _debugWinButton;
 
-        private GamePresenter _presenter;
+        public event Action DebugWinClicked;
 
         private void Awake()
         {
             if (_debugWinButton != null)
             {
-                _debugWinButton.onClick.AddListener(OnDebugWinClicked);
-            }
-        }
-
-        private void OnEnable()
-        {
-            _presenter = new GamePresenter(this);
-            _presenter.OnOpen();
-        }
-
-        private void OnDisable()
-        {
-            if (_presenter != null)
-            {
-                _presenter.OnClose();
-                _presenter = null;
+                _debugWinButton.onClick.AddListener(OnDebugWinClickedInternal);
             }
         }
 
@@ -38,7 +24,7 @@ namespace UI.Game
         {
             if (_debugWinButton != null)
             {
-                _debugWinButton.onClick.RemoveListener(OnDebugWinClicked);
+                _debugWinButton.onClick.RemoveListener(OnDebugWinClickedInternal);
             }
         }
 
@@ -50,12 +36,9 @@ namespace UI.Game
             }
         }
 
-        private void OnDebugWinClicked()
+        private void OnDebugWinClickedInternal()
         {
-            if (_presenter != null)
-            {
-                _presenter.DebugWin();
-            }
+            DebugWinClicked?.Invoke();
         }
     }
 }

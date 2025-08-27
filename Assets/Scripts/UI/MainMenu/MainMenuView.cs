@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,29 +10,14 @@ namespace UI.MainMenu
         [SerializeField] private TMP_Text _title;
         [SerializeField] private TMP_Text _progressText;
         [SerializeField] private Button _playButton;
-
-        private MainMenuPresenter _presenter;
+        
+        public event Action PlayClicked;
 
         private void Awake()
         {
             if (_playButton != null)
             {
                 _playButton.onClick.AddListener(OnPlayClicked);
-            }
-        }
-
-        private void OnEnable()
-        {
-            _presenter = new MainMenuPresenter(this);
-            _presenter.OnOpen();
-        }
-
-        private void OnDisable()
-        {
-            if (_presenter != null)
-            {
-                _presenter.OnClose();
-                _presenter = null;
             }
         }
 
@@ -43,14 +29,6 @@ namespace UI.MainMenu
             }
         }
 
-        public void SetTitle(string text)
-        {
-            if (_title != null)
-            {
-                _title.text = text;
-            }
-        }
-
         public void SetProgressText(string text)
         {
             if (_progressText != null)
@@ -59,12 +37,17 @@ namespace UI.MainMenu
             }
         }
 
+        public void SetTitle(string text)
+        {
+            if (_title != null)
+            {
+                _title.text = text;
+            }
+        }
+
         private void OnPlayClicked()
         {
-            if (_presenter != null)
-            {
-                _presenter.StartGame();
-            }
+            PlayClicked?.Invoke();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,33 +12,19 @@ namespace UI.Win
         [SerializeField] private Button _mainMenuButton;
         [SerializeField] private Button _nextLevelButton;
 
-        private WinPresenter _presenter;
+        public event Action MainMenuClicked;
+        public event Action NextLevelClicked;
 
         private void Awake()
         {
             if (_mainMenuButton != null)
             {
-                _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+                _mainMenuButton.onClick.AddListener(OnMainMenuClickedInternal);
             }
 
             if (_nextLevelButton != null)
             {
-                _nextLevelButton.onClick.AddListener(OnNextLevelClicked);
-            }
-        }
-
-        private void OnEnable()
-        {
-            _presenter = new WinPresenter(this);
-            _presenter.OnOpen();
-        }
-
-        private void OnDisable()
-        {
-            if (_presenter != null)
-            {
-                _presenter.OnClose();
-                _presenter = null;
+                _nextLevelButton.onClick.AddListener(OnNextLevelClickedInternal);
             }
         }
 
@@ -45,12 +32,12 @@ namespace UI.Win
         {
             if (_mainMenuButton != null)
             {
-                _mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
+                _mainMenuButton.onClick.RemoveListener(OnMainMenuClickedInternal);
             }
 
             if (_nextLevelButton != null)
             {
-                _nextLevelButton.onClick.RemoveListener(OnNextLevelClicked);
+                _nextLevelButton.onClick.RemoveListener(OnNextLevelClickedInternal);
             }
         }
 
@@ -67,20 +54,14 @@ namespace UI.Win
             return _wordsContainer;
         }
 
-        private void OnMainMenuClicked()
+        private void OnMainMenuClickedInternal()
         {
-            if (_presenter != null)
-            {
-                _presenter.GoToMainMenu();
-            }
+            MainMenuClicked?.Invoke();
         }
 
-        private void OnNextLevelClicked()
+        private void OnNextLevelClickedInternal()
         {
-            if (_presenter != null)
-            {
-                _presenter.GoToNextLevel();
-            }
+            NextLevelClicked?.Invoke();
         }
     }
 }

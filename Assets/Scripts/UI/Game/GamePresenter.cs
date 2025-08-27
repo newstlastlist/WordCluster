@@ -8,8 +8,8 @@ namespace UI.Game
     public sealed class GamePresenter
     {
         private readonly GameView _view;
-        private readonly ILevelRepository _levelsRepo;
-        private readonly IProgressService _progress;
+        private readonly ILevelRepository _levelRepository;
+        private readonly IProgressService _progressService;
         private readonly IScreenNavigator _screenNavigator;
 
         private int _currentLevelIndex;
@@ -17,35 +17,37 @@ namespace UI.Game
         public GamePresenter(GameView view)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
-            _levelsRepo = Services.Get<ILevelRepository>();
-            _progress = Services.Get<IProgressService>();
+            _levelRepository = Services.Get<ILevelRepository>();
+            _progressService = Services.Get<IProgressService>();
             _screenNavigator = Services.Get<IScreenNavigator>();
         }
 
-        public void OnOpen()
+        public void Open()
         {
-            _currentLevelIndex = Math.Clamp(_progress.LastCompletedLevelIndex + 1, 0, Math.Max(0, _levelsRepo.Count - 1));
-            var all = _levelsRepo.LoadAll();
+            _view.DebugWinClicked += OnDebugWinClicked;
+
+            _currentLevelIndex = Math.Clamp(_progressService.LastCompletedLevelIndex + 1, 0, Math.Max(0, _levelRepository.Count - 1));
+            var all = _levelRepository.LoadAll();
             var level = all.Length > 0 ? all[_currentLevelIndex] : null;
 
             string header = level != null
-                ? $"LEVEL {level.Id} — {level.Layout.Rows}×{level.Layout.WordLength}"
-                : "THERE IS NO LEVELS";
+                ? $"Level {level.Id} — {level.Layout.Rows}×{level.Layout.WordLength}"
+                : "No levels";
 
             _view.SetHeader(header);
 
-            // Здесь позже: инициализация доменной логики, построение грида и полосы кластеров
+            // TODO: greed , clusters
         }
 
-        public void OnClose()
+        public void Close()
         {
-            // позже: освобождение подписок/ресурсов
+            _view.DebugWinClicked -= OnDebugWinClicked;
         }
 
-        public void DebugWin()
+        private void OnDebugWinClicked()
         {
-            _progress.LastCompletedLevelIndex = Math.Max(_progress.LastCompletedLevelIndex, _currentLevelIndex);
-            _progress.Save();
+            _progressService.LastCompletedLevelIndex = Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
+            _progressService.Save();
 
             _screenNavigator.Show(ScreenId.Win);
         }
