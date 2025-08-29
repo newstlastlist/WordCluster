@@ -32,15 +32,17 @@ namespace UI.Game
 
         public void Open()
         {
+            _view.OnDebugWinClicked += OnDebugWinClickedHandler;
             _view.OnCellClicked += OnCellClickedHandler;
             _view.OnClusterClicked += OnClusterClickedHandler;
-            _view.OnDebugWinClicked += OnDebugWinClickedHandler;
-
-            _currentLevelIndex = Math.Clamp(_progressService.LastCompletedLevelIndex + 1, 0, Math.Max(0, _levelRepository.Count - 1));
+            _view.OnClusterDropped += OnClusterDroppedHandler;
 
             var levels = _levelRepository.LoadAll();
-            var levelData = levels.Length > 0 ? levels[_currentLevelIndex] : null;
+            int levelsCount = levels.Length;
 
+            _currentLevelIndex = _progressService.ResolveCurrentLevelIndex(levelsCount);
+
+            var levelData = levels.Length > 0 ? levels[_currentLevelIndex] : null;
             if (levelData == null)
             {
                 _view.SetHeader("No levels");
@@ -51,12 +53,9 @@ namespace UI.Game
             }
 
             _view.SetHeader($"Level {levelData.Id}");
-
             BuildDomainForLevel(levelData);
-
             _view.BuildGrid(_boardState.RowsCount, _boardState.WordLength);
             _view.RenderClusters(_clusterTextById);
-            _view.OnClusterDropped += OnClusterDroppedHandler;
         }
 
         public void Close()
@@ -153,20 +152,20 @@ namespace UI.Game
 
             if (_boardState.IsVictory())
             {
-                _progressService.LastCompletedLevelIndex =
-                    Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
-
+                int levelsCount = _levelRepository.Count;
+                _progressService.OnLevelCompleted(levelsCount, _currentLevelIndex);
                 _progressService.Save();
+
                 _screenNavigator.Show(ScreenId.Win);
             }
         }
 
         private void ForceWinForDebug()
         {
-            _progressService.LastCompletedLevelIndex =
-                Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
-
+            int levelsCount = _levelRepository.Count;
+            _progressService.OnLevelCompleted(levelsCount, _currentLevelIndex);
             _progressService.Save();
+
             _screenNavigator.Show(ScreenId.Win);
         }
         
