@@ -33,8 +33,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 129.90005}
-  m_SizeDelta: {x: 0, y: -809.1999}
+  m_AnchoredPosition: {x: 0, y: 262.74005}
+  m_SizeDelta: {x: 0, y: -1074.8799}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6012010181739735440
 MonoBehaviour:
@@ -53,12 +53,12 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
-  m_Spacing: 0
+  m_ChildAlignment: 4
+  m_Spacing: 30
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
@@ -683,10 +683,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a768b1eb5fd74a0ab3c0c1f4b12210d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.Win.WinView
-  _resultsTitle: {fileID: 3805694190531670030}
+  _resultTitleText: {fileID: 3805694190531670030}
   _wordsContainer: {fileID: 2207515605062864997}
+  _wordItemPrefab: {fileID: 1880626993826627850, guid: 79e7c9a4ae974d440be821c8885e4363, type: 3}
   _mainMenuButton: {fileID: 9107366553554528489}
-  _nextLevelButton: {fileID: 4217104718082335271}
+  _nextButton: {fileID: 4217104718082335271}
 --- !u!1 &5752308286220748815
 GameObject:
   m_ObjectHideFlags: 0
