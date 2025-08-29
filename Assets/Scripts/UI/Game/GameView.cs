@@ -340,6 +340,36 @@ namespace UI.Game
                 }
             }
         }
+        
+        public void ResetForNewLevel()
+        {
+            ClearGridInternal();
+            ClearClustersInternal();
+            ClearBoardOverlayInternal();
+        }
+
+        public void ClearAllVisuals()
+        {
+            ClearGridInternal();
+            ClearClustersInternal();
+            ClearBoardOverlayInternal();
+        }
+        
+        private void ClearBoardOverlayInternal()
+        {
+            // уничтожаем инстансы рамок
+            foreach (var kvp in _clusterFrames)
+            {
+                RectTransform frame = kvp.Value.frame;
+                if (frame != null)
+                {
+                    Destroy(frame.gameObject);
+                }
+            }
+
+            _clusterFrames.Clear();
+            _clusterOnBoard.Clear();
+        }
 
         private void OnDebugWinClickedHandler()
         {

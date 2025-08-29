@@ -35,6 +35,8 @@ namespace UI.Game
         {
             _view.OnDebugWinClicked += OnDebugWinClickedHandler;
             _view.OnClusterDropped += OnClusterDroppedHandler;
+            
+            _view.ResetForNewLevel();
 
             var levels = _levelRepository.LoadAll();
             int levelsCount = levels.Length;
@@ -61,15 +63,16 @@ namespace UI.Game
             _view.BuildGrid(_boardState.RowsCount, _boardState.WordLength);
             _view.RenderClusters(_clusterTextById);
             _view.ClearAllCells(); // буквы не рисуем в ячейки — визуал только рамками
+            
         }
 
         public void Close()
         {
             _view.OnDebugWinClicked -= OnDebugWinClickedHandler;
             _view.OnClusterDropped -= OnClusterDroppedHandler;
+            
+            _view.ClearAllVisuals();
         }
-
-        // ===== Приватные методы =====
 
         private void BuildDomainForLevelHandler(LevelData level)
         {

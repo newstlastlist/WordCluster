@@ -41,8 +41,6 @@ namespace UI.Win
         {
             _view.OnMainMenuClicked -= OnMainMenuClickedHandler;
             _view.OnNextLevelClicked -= OnNextLevelClickedHandler;
-            
-            _solvedWordsOrderService.Clear();
         }
 
         private void OnMainMenuClickedHandler()
