@@ -246,20 +246,22 @@ namespace UI.Game
 
         public void AttachClusterToBoard(int clusterId, int rowIndex, int startColumn)
         {
-            if (!_clusterFrames.TryGetValue(clusterId, out var tuple))
+            if (!_clusterFrames.TryGetValue(clusterId, out var tuple) || _boardOverlay == null)
             {
-                return;
-            }
-
-            if (_boardOverlay == null)
-            {
-                Debug.LogWarning("[GameView] BoardOverlay is not assigned.");
                 return;
             }
 
             tuple.frame.SetParent(_boardOverlay, worldPositionStays: false);
 
-            Vector2 pos = CalculateFrameAnchoredPosHandler(rowIndex, startColumn);
+            // гарантируем опору Top-Left у рамки (если префабы не правили)
+            tuple.frame.anchorMin = new Vector2(0f, 1f);
+            tuple.frame.anchorMax = new Vector2(0f, 1f);
+            tuple.frame.pivot     = new Vector2(0f, 1f);
+
+            Vector2 pos = CalculateFramePosFromCellHandler(rowIndex, startColumn, tuple.lettersContainer);
+            tuple.frame.anchorMin = new Vector2(0f, 1f);
+            tuple.frame.anchorMax = new Vector2(0f, 1f);
+            tuple.frame.pivot     = new Vector2(0f, 1f);
             tuple.frame.anchoredPosition = pos;
 
             _clusterOnBoard[clusterId] = true;
@@ -424,11 +426,40 @@ namespace UI.Game
             }
         }
 
-        private Vector2 CalculateFrameAnchoredPosHandler(int rowIndex, int startColumn)
+        private Vector2 CalculateFramePosFromCellHandler(int rowIndex, int startColumn, RectTransform lettersContainer)
         {
-            float x = _gridPadding.x + startColumn * (_cellSize.x + _cellSpacing.x);
-            float y = -_gridPadding.y - rowIndex * (_cellSize.y + _cellSpacing.y);
-            return new Vector2(x, y);
+            // 1) берём RectTransform нужной ячейки
+            if (!_cellMap.TryGetValue((rowIndex, startColumn), out var cellTuple) || cellTuple.button == null)
+            {
+                return Vector2.zero;
+            }
+
+            var cellRect = cellTuple.button.GetComponent<RectTransform>();
+            if (cellRect == null || _boardOverlay == null)
+            {
+                return Vector2.zero;
+            }
+
+            // 2) получаем ВЕРХ-ЛЕВЫЙ угол ячейки в локальных координатах BoardOverlay
+            Vector3[] corners = new Vector3[4];
+            cellRect.GetWorldCorners(corners);              // 0:BL 1:TL 2:TR 3:BR
+            Vector3 worldTL = corners[1];
+
+            Vector2 localTL;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _boardOverlay,
+                RectTransformUtility.WorldToScreenPoint(null, worldTL),
+                null,
+                out localTL
+            );
+
+            // 3) учтём padding у LettersContainer, чтобы первая буква попала точно в ячейку
+            var hlg = lettersContainer != null ? lettersContainer.GetComponent<HorizontalLayoutGroup>() : null;
+            int padLeft = hlg != null ? hlg.padding.left : 0;
+            int padTop  = hlg != null ? hlg.padding.top  : 0;
+
+            // pivot рамки = Top-Left, поэтому смещаем на -padLeft по X и +padTop по Y
+            return new Vector2(localTL.x - padLeft, localTL.y + padTop);
         }
 
         private GameObject GetClusterPrefabForLengthHandler(int length)
