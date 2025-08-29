@@ -252,6 +252,16 @@ namespace UI.Game
             }
 
             tuple.frame.SetParent(_boardOverlay, worldPositionStays: false);
+            
+            var cg = tuple.frame.GetComponent<CanvasGroup>();
+            if (cg == null)
+            {
+                cg = tuple.frame.gameObject.GetComponent<CanvasGroup>();
+            }
+            if (cg != null)
+            {
+                cg.alpha = 1f;
+            }
 
             // гарантируем опору Top-Left у рамки (если префабы не правили)
             tuple.frame.anchorMin = new Vector2(0f, 1f);
@@ -288,6 +298,47 @@ namespace UI.Game
             }
 
             BuildLettersForClusterHandler(tuple.lettersContainer, text ?? string.Empty);
+        }
+        
+        public void SetClusterLocked(int clusterId, bool locked)
+        {
+            if (_clusterMap.TryGetValue(clusterId, out var tuple))
+            {
+                if (tuple.drag != null)
+                {
+                    // выключаем сам drag
+                    tuple.drag.enabled = !locked;
+
+                    var cg = tuple.drag.GetComponent<CanvasGroup>();
+                    if (cg != null)
+                    {
+                        cg.alpha = 1f;
+
+                        cg.interactable = !locked;
+                        cg.blocksRaycasts = true;
+                    }
+                }
+            }
+        }
+        
+        public void SetClusterFrameState(int clusterId, ClusterView.FrameState state)
+        {
+            if (_clusterMap.TryGetValue(clusterId, out var tuple))
+            {
+                var cv = tuple.button != null
+                    ? tuple.button.GetComponent<ClusterView>()
+                    : null;
+
+                if (cv == null && tuple.drag != null)
+                {
+                    cv = tuple.drag.GetComponent<ClusterView>();
+                }
+
+                if (cv != null)
+                {
+                    cv.ChangeFrameColor(state);
+                }
+            }
         }
 
         private void OnDebugWinClickedHandler()
