@@ -18,8 +18,8 @@ namespace UI.Game
         private BoardState _boardState;
 
         private readonly Dictionary<int, string> _clusterTextById = new Dictionary<int, string>();
-
         private int? _selectedClusterId;
+        
         public int CurrentLevelIndex => _currentLevelIndex;
 
         public GamePresenter(GameView view)
@@ -32,14 +32,16 @@ namespace UI.Game
 
         public void Open()
         {
+            _view.CellClicked += OnCellClicked;
+            _view.ClusterClicked += OnClusterClicked;
             _view.DebugWinClicked += OnDebugWinClicked;
 
             _currentLevelIndex = Math.Clamp(_progressService.LastCompletedLevelIndex + 1, 0, Math.Max(0, _levelRepository.Count - 1));
 
             var levels = _levelRepository.LoadAll();
-            var level = levels.Length > 0 ? levels[_currentLevelIndex] : null;
+            var levelData = levels.Length > 0 ? levels[_currentLevelIndex] : null;
 
-            if (level == null)
+            if (levelData == null)
             {
                 _view.SetHeader("No levels");
                 _boardState = null;
@@ -48,96 +50,23 @@ namespace UI.Game
                 return;
             }
 
-            _view.SetHeader($"Level {level.Id} — {level.Layout.Rows}×{level.Layout.WordLength}");
+            _view.SetHeader($"Level {levelData.Id} — {levelData.Layout.Rows}×{levelData.Layout.WordLength}");
 
-            BuildDomainForLevel(level);
+            BuildDomainForLevel(levelData);
 
-            // Здесь позже: отдать данные во View для построения грида и списка кластеров
-            // (размеры берём из _boardState.RowsCount и _boardState.WordLength; кластеры — из _clusterTextById)
+            _view.BuildGrid(_boardState.RowsCount, _boardState.WordLength);
+            _view.RenderClusters(_clusterTextById);
         }
 
         public void Close()
         {
             _view.DebugWinClicked -= OnDebugWinClicked;
+            _view.CellClicked -= OnCellClicked;
+            _view.ClusterClicked -= OnClusterClicked;
 
             _selectedClusterId = null;
             _clusterTextById.Clear();
             _boardState = null;
-        }
-
-        public void SelectCluster(int clusterId)
-        {
-            if (_clusterTextById.ContainsKey(clusterId))
-            {
-                _selectedClusterId = clusterId;
-                return;
-            }
-
-            _selectedClusterId = null;
-        }
-
-        public void ClearSelectedCluster()
-        {
-            _selectedClusterId = null;
-        }
-
-        public BoardState.PlacementResult RequestPlaceSelectedCluster(int rowIndex, int startColumn)
-        {
-            if (_boardState == null)
-            {
-                return new BoardState.PlacementResult { Success = false, Error = BoardState.PlacementError.UnknownCluster };
-            }
-
-            if (_selectedClusterId.HasValue == false)
-            {
-                return new BoardState.PlacementResult { Success = false, Error = BoardState.PlacementError.UnknownCluster };
-            }
-
-            int clusterId = _selectedClusterId.Value;
-            var result = _boardState.TryPlaceCluster(clusterId, rowIndex, startColumn);
-
-            if (result.Success)
-            {
-                _selectedClusterId = null;
-                TryTriggerVictoryIfSolved();
-            }
-
-            return result;
-        }
-
-        public BoardState.PlacementResult RequestMoveCluster(int clusterId, int newRowIndex, int newStartColumn)
-        {
-            if (_boardState == null)
-            {
-                return new BoardState.PlacementResult { Success = false, Error = BoardState.PlacementError.UnknownCluster };
-            }
-
-            var result = _boardState.TryMoveCluster(clusterId, newRowIndex, newStartColumn);
-
-            if (result.Success)
-            {
-                TryTriggerVictoryIfSolved();
-            }
-
-            return result;
-        }
-
-        public bool RequestRemoveCluster(int clusterId)
-        {
-            if (_boardState == null)
-            {
-                return false;
-            }
-
-            bool removed = _boardState.TryRemoveCluster(clusterId);
-
-            if (removed)
-            {
-                // Победа от удаления не наступит, но держим общую логику единообразной
-                TryTriggerVictoryIfSolved();
-            }
-
-            return removed;
         }
 
         public BoardState GetBoardState()
@@ -155,12 +84,44 @@ namespace UI.Game
             ForceWinForDebug();
         }
 
+        private void OnClusterClicked(int clusterId)
+        {
+            if (_clusterTextById.ContainsKey(clusterId))
+            {
+                _selectedClusterId = clusterId;
+            }
+        }
+
+        private void OnCellClicked(int rowIndex, int colIndex)
+        {
+            if (_boardState == null || !_selectedClusterId.HasValue)
+            {
+                return;
+            }
+
+            int clusterId = _selectedClusterId.Value;
+
+            var result = _boardState.TryPlaceCluster(clusterId, rowIndex, colIndex);
+            if (result.Success)
+            {
+                _selectedClusterId = null;
+
+                RefreshGridFromBoardState();
+                _view.SetClusterInteractable(clusterId, false);
+
+                TryTriggerVictoryIfSolved();
+            }
+            else
+            {
+                // TODO: можно подсветить ошибку в UI (например, красный флеш ячеек)
+            }
+        }
+
         private void BuildDomainForLevel(LevelData levelData)
         {
             _clusterTextById.Clear();
 
             var clusterPairs = new List<(int clusterId, string clusterText)>(levelData.Clusters.Length);
-
             for (int i = 0; i < levelData.Clusters.Length; i++)
             {
                 string clusterText = levelData.Clusters[i];
@@ -176,6 +137,31 @@ namespace UI.Game
             );
         }
 
+        private void RefreshGridFromBoardState()
+        {
+            if (_boardState == null)
+            {
+                return;
+            }
+
+            _view.ClearAllCells();
+
+            var placements = _boardState.GetPlacementsSnapshot();
+            foreach (var placement in placements)
+            {
+                string clusterText = _clusterTextById[placement.clusterId];
+
+                for (int k = 0; k < placement.length; k++)
+                {
+                    int rowIndex = placement.rowIndex;
+                    int colIndex = placement.startColumn + k;
+                    char ch = clusterText[k];
+
+                    _view.SetCellChar(rowIndex, colIndex, ch);
+                }
+            }
+        }
+
         private void TryTriggerVictoryIfSolved()
         {
             if (_boardState == null)
@@ -185,18 +171,20 @@ namespace UI.Game
 
             if (_boardState.IsVictory())
             {
-                _progressService.LastCompletedLevelIndex = Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
-                _progressService.Save();
+                _progressService.LastCompletedLevelIndex =
+                    Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
 
+                _progressService.Save();
                 _screenNavigator.Show(ScreenId.Win);
             }
         }
 
         private void ForceWinForDebug()
         {
-            _progressService.LastCompletedLevelIndex = Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
-            _progressService.Save();
+            _progressService.LastCompletedLevelIndex =
+                Math.Max(_progressService.LastCompletedLevelIndex, _currentLevelIndex);
 
+            _progressService.Save();
             _screenNavigator.Show(ScreenId.Win);
         }
     }
