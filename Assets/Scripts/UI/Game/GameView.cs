@@ -17,28 +17,37 @@ namespace UI.Game
         [SerializeField] private GameObject _cellButtonPrefab;
 
         [Header("Clusters")]
-        [SerializeField] private RectTransform _clustersContent; // ScrollView -> Viewport -> Content
+        [SerializeField] private RectTransform _clustersContent;
         [SerializeField] private GameObject _clusterItemPrefab;
         
-        [Header("Debug")]
+        [Header("DEBUG")]
         [SerializeField] private Button _debugButton;
 
-        private readonly Dictionary<(int rowIndex, int colIndex), (Button button, TMP_Text label)> _cellMap =
-            new Dictionary<(int, int), (Button, TMP_Text)>();
+        private readonly Dictionary<(int row, int col), (Button button, TMP_Text label, CellDropHandler drop)> _cellMap =
+            new Dictionary<(int, int), (Button, TMP_Text, CellDropHandler)>();
 
-        private readonly Dictionary<int, (Button button, TMP_Text label)> _clusterMap =
-            new Dictionary<int, (Button, TMP_Text)>();
+        private readonly Dictionary<int, (Button button, TMP_Text label, ClusterDragHandler drag)> _clusterMap =
+            new Dictionary<int, (Button, TMP_Text, ClusterDragHandler)>();
+        
+        // для корректной отписки
+        private readonly Dictionary<int, Action<int, Vector2>> _draggedHandlers =
+            new Dictionary<int, Action<int, Vector2>>();
+        private readonly Dictionary<int, Action<int, Vector2>> _dragEndedHandlers =
+            new Dictionary<int, Action<int, Vector2>>();
 
         public int RowsCount { get; private set; }
         public int WordLength { get; private set; }
-        
-        public event Action<int, int> CellClicked;
-        public event Action<int> ClusterClicked;
-        public event Action DebugWinClicked;
+
+        public event Action<int, int> OnCellClicked; // row, col
+        public event Action<int> OnClusterClicked; // clusterId
+        public event Action<int, int, int> OnClusterDropped; // clusterId, row, col
+        public event Action<int> OnClusterDragStarted; // clusterId
+        public event Action<int> OnClusterDragEnded; // clusterId
+        public event Action OnDebugWinClicked;
 
         private void Awake()
         {
-            _debugButton.onClick.AddListener(() => DebugWinClicked?.Invoke());
+            _debugButton.onClick.AddListener(() => OnDebugWinClicked?.Invoke());
         }
 
         private void OnDestroy()
@@ -53,7 +62,7 @@ namespace UI.Game
                 _headerText.text = text;
             }
         }
-        
+
         public void BuildGrid(int rowsCount, int wordLength)
         {
             RowsCount = Mathf.Max(0, rowsCount);
@@ -75,27 +84,27 @@ namespace UI.Game
                 for (int col = 0; col < WordLength; col++)
                 {
                     GameObject go = Instantiate(_cellButtonPrefab, _gridContainer);
-                    if (go == null)
-                    {
-                        continue;
-                    }
+                    if (go == null) continue;
 
                     Button btn = go.GetComponent<Button>();
                     TMP_Text label = go.GetComponentInChildren<TMP_Text>(true);
+                    CellDropHandler dropHandler = go.GetComponent<CellDropHandler>();
 
-                    if (label != null)
-                    {
-                        label.text = string.Empty;
-                    }
-
+                    if (label != null) label.text = string.Empty;
                     if (btn != null)
                     {
                         int capturedRow = row;
                         int capturedCol = col;
-                        btn.onClick.AddListener(() => OnCellButtonClicked(capturedRow, capturedCol));
+                        btn.onClick.AddListener(() => OnCellButtonClickedHandler(capturedRow, capturedCol));
                     }
 
-                    _cellMap[(row, col)] = (btn, label);
+                    if (dropHandler != null)
+                    {
+                        dropHandler.SetCoordinates(row, col);
+                        dropHandler.OnClusterDropped += OnOnClusterDroppedInternalHandler;
+                    }
+
+                    _cellMap[(row, col)] = (btn, label, dropHandler);
                 }
             }
         }
@@ -110,37 +119,54 @@ namespace UI.Game
                 return;
             }
 
-            if (clustersById == null || clustersById.Count == 0)
-            {
-                return;
-            }
-
             foreach (var kvp in clustersById)
             {
                 int clusterId = kvp.Key;
                 string clusterText = kvp.Value ?? string.Empty;
 
                 GameObject go = Instantiate(_clusterItemPrefab, _clustersContent);
-                if (go == null)
-                {
-                    continue;
-                }
+                if (go == null) continue;
 
                 Button btn = go.GetComponent<Button>();
                 TMP_Text label = go.GetComponentInChildren<TMP_Text>(true);
+                ClusterDragHandler dragHandler = go.GetComponent<ClusterDragHandler>();
 
-                if (label != null)
-                {
-                    label.text = clusterText;
-                }
-
+                if (label != null) label.text = clusterText;
                 if (btn != null)
                 {
                     int capturedId = clusterId;
-                    btn.onClick.AddListener(() => OnClusterButtonClicked(capturedId));
+                    btn.onClick.AddListener(() => OnClusterButtonClickedHandler(capturedId));
                 }
 
-                _clusterMap[clusterId] = (btn, label);
+                if (dragHandler != null)
+                {
+                    dragHandler.SetClusterId(clusterId);
+
+                    // Создаём делегаты, сохраняем их, подписываемся:
+                    Action<int, Vector2> onDragged = (id, _) =>
+                    {
+                        if (OnClusterDragStarted != null)
+                        {
+                            OnClusterDragStarted.Invoke(id);
+                        }
+                    };
+
+                    Action<int, Vector2> onDragEnded = (id, _) =>
+                    {
+                        if (OnClusterDragEnded != null)
+                        {
+                            OnClusterDragEnded.Invoke(id);
+                        }
+                    };
+
+                    _draggedHandlers[clusterId] = onDragged;
+                    _dragEndedHandlers[clusterId] = onDragEnded;
+
+                    dragHandler.OnDragged += onDragged;
+                    dragHandler.OnDragEnded += onDragEnded;
+                }
+
+                _clusterMap[clusterId] = (btn, label, dragHandler);
             }
         }
 
@@ -160,10 +186,7 @@ namespace UI.Game
             foreach (var pair in _cellMap)
             {
                 TMP_Text label = pair.Value.label;
-                if (label != null)
-                {
-                    label.text = string.Empty;
-                }
+                if (label != null) label.text = string.Empty;
             }
         }
 
@@ -183,14 +206,19 @@ namespace UI.Game
             }
         }
 
-        private void OnCellButtonClicked(int rowIndex, int colIndex)
+        private void OnCellButtonClickedHandler(int row, int col)
         {
-            CellClicked?.Invoke(rowIndex, colIndex);
+            OnCellClicked?.Invoke(row, col);
         }
 
-        private void OnClusterButtonClicked(int clusterId)
+        private void OnClusterButtonClickedHandler(int clusterId)
         {
-            ClusterClicked?.Invoke(clusterId);
+            OnClusterClicked?.Invoke(clusterId);
+        }
+
+        private void OnOnClusterDroppedInternalHandler(int clusterId, int row, int col)
+        {
+            OnClusterDropped?.Invoke(clusterId, row, col);
         }
 
         private void ClearGridInternal()
@@ -198,10 +226,10 @@ namespace UI.Game
             foreach (var pair in _cellMap)
             {
                 Button btn = pair.Value.button;
-                if (btn != null)
-                {
-                    btn.onClick.RemoveAllListeners();
-                }
+                if (btn != null) btn.onClick.RemoveAllListeners();
+
+                if (pair.Value.drop != null)
+                    pair.Value.drop.OnClusterDropped -= OnOnClusterDroppedInternalHandler;
             }
 
             _cellMap.Clear();
@@ -210,8 +238,7 @@ namespace UI.Game
             {
                 for (int i = _gridContainer.childCount - 1; i >= 0; i--)
                 {
-                    Transform child = _gridContainer.GetChild(i);
-                    Destroy(child.gameObject);
+                    Destroy(_gridContainer.GetChild(i).gameObject);
                 }
             }
         }
@@ -225,6 +252,21 @@ namespace UI.Game
                 {
                     btn.onClick.RemoveAllListeners();
                 }
+
+                ClusterDragHandler drag = pair.Value.drag;
+                int clusterId = pair.Key;
+                if (drag != null)
+                {
+                    if (_draggedHandlers.TryGetValue(clusterId, out var onDragged))
+                    {
+                        drag.OnDragged -= onDragged;
+                    }
+
+                    if (_dragEndedHandlers.TryGetValue(clusterId, out var onDragEnded))
+                    {
+                        drag.OnDragEnded -= onDragEnded;
+                    }
+                }
             }
 
             _clusterMap.Clear();
@@ -233,8 +275,7 @@ namespace UI.Game
             {
                 for (int i = _clustersContent.childCount - 1; i >= 0; i--)
                 {
-                    Transform child = _clustersContent.GetChild(i);
-                    Destroy(child.gameObject);
+                    Destroy(_clustersContent.GetChild(i).gameObject);
                 }
             }
         }
