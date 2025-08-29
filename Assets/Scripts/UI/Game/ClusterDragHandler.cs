@@ -12,6 +12,10 @@ namespace UI.Game
         private RectTransform _rectTransform;
         private Transform _originalParent;
         private Transform _rootCanvasTransform;
+        private bool _skipReturnToOriginalParentOnce;
+        private RectTransform _lettersContainer;
+        private float _cellWidth;
+        private float _cellSpacing;
 
         public int ClusterId => _clusterId;
 
@@ -65,6 +69,13 @@ namespace UI.Game
                 _canvasGroup.alpha = 1f;
             }
 
+            if (_skipReturnToOriginalParentOnce)
+            {
+                _skipReturnToOriginalParentOnce = false;
+                OnDragEnded?.Invoke(_clusterId, eventData.position);
+                return;
+            }
+
             if (_originalParent != null)
             {
                 transform.SetParent(_originalParent);
@@ -75,15 +86,59 @@ namespace UI.Game
                 _rectTransform.anchoredPosition = Vector2.zero;
             }
 
-            if (OnDragEnded != null)
-            {
-                OnDragEnded.Invoke(_clusterId, eventData.position);
-            }
+            OnDragEnded?.Invoke(_clusterId, eventData.position);
         }
 
         public void SetClusterId(int clusterId)
         {
             _clusterId = clusterId;
+        }
+        
+        public void MarkDropAcceptedOnce()
+        {
+            _skipReturnToOriginalParentOnce = true;
+        }
+        
+        public void SetLettersContainer(RectTransform lettersContainer)
+        {
+            _lettersContainer = lettersContainer;
+        }
+        
+        public void SetCellGeometry(float cellWidth, float cellSpacing)
+        {
+            _cellWidth = cellWidth;
+            _cellSpacing = cellSpacing;
+        }
+        
+        public int GetGrabbedLetterIndex(UnityEngine.EventSystems.PointerEventData eventData)
+        {
+            if (_lettersContainer == null)
+            {
+                return 0;
+            }
+
+            // экран → локальные координаты контейнера букв
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    _lettersContainer, eventData.position, eventData.pressEventCamera, out var local))
+            {
+                return 0;
+            }
+
+            // учитываем pivot контейнера
+            float leftEdge = -_lettersContainer.rect.width * _lettersContainer.pivot.x;
+
+            // учитываем padding HorizontalLayoutGroup
+            var hlg = _lettersContainer.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+            int padLeft = hlg != null ? hlg.padding.left : 0;
+
+            // x-позиция относительно левого края первой буквы
+            float xFromFirst = (local.x - leftEdge) - padLeft;
+
+            float step = _cellWidth + _cellSpacing;
+            int index = Mathf.RoundToInt(xFromFirst / step);
+            int lettersCount = _lettersContainer.childCount;
+
+            return Mathf.Clamp(index, 0, Mathf.Max(0, lettersCount - 1));
         }
     }
 }

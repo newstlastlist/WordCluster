@@ -129,6 +129,7 @@ namespace UI.Game
                     if (dropHandler != null)
                     {
                         dropHandler.SetCoordinates(row, col);
+                        dropHandler.SetWordLength(WordLength);
                         dropHandler.OnClusterDropped += OnClusterDroppedInternalHandler;
                     }
 
@@ -196,6 +197,8 @@ namespace UI.Game
                 if (drag != null)
                 {
                     drag.SetClusterId(clusterId);
+                    drag.SetLettersContainer(lettersContainer);
+                    drag.SetCellGeometry(_cellSize.x, _cellSpacing.x);
 
                     Action<int, Vector2> onDragged = (id, _) =>
                     {
@@ -218,14 +221,6 @@ namespace UI.Game
                 _clusterMap[clusterId] = (btn, null, drag);
                 _clusterFrames[clusterId] = (frameRect, lettersContainer);
                 _clusterOnBoard[clusterId] = false;
-            }
-        }
-
-        public void SetCellChar(int rowIndex, int colIndex, char? ch)
-        {
-            if (_cellMap.TryGetValue((rowIndex, colIndex), out var tuple) && tuple.label != null)
-            {
-                tuple.label.text = ch.HasValue ? ch.Value.ToString() : string.Empty;
             }
         }
 

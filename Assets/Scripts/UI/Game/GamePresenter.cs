@@ -50,12 +50,13 @@ namespace UI.Game
                 return;
             }
 
-            _view.SetHeader($"Level {levelData.Id} — {levelData.Layout.Rows}×{levelData.Layout.WordLength}");
+            _view.SetHeader($"Level {levelData.Id}");
 
             BuildDomainForLevel(levelData);
 
             _view.BuildGrid(_boardState.RowsCount, _boardState.WordLength);
             _view.RenderClusters(_clusterTextById);
+            _view.OnClusterDropped += OnClusterDroppedHandler;
         }
 
         public void Close()
@@ -63,6 +64,7 @@ namespace UI.Game
             _view.OnDebugWinClicked -= OnDebugWinClickedHandler;
             _view.OnCellClicked -= OnCellClickedHandler;
             _view.OnClusterClicked -= OnClusterClickedHandler;
+            _view.OnClusterDropped -= OnClusterDroppedHandler;
 
             _selectedClusterId = null;
             _clusterTextById.Clear();
@@ -139,27 +141,7 @@ namespace UI.Game
 
         private void RefreshGridFromBoardState()
         {
-            if (_boardState == null)
-            {
-                return;
-            }
-
             _view.ClearAllCells();
-
-            var placements = _boardState.GetPlacementsSnapshot();
-            foreach (var placement in placements)
-            {
-                string clusterText = _clusterTextById[placement.clusterId];
-
-                for (int k = 0; k < placement.length; k++)
-                {
-                    int rowIndex = placement.rowIndex;
-                    int colIndex = placement.startColumn + k;
-                    char ch = clusterText[k];
-
-                    _view.SetCellChar(rowIndex, colIndex, ch);
-                }
-            }
         }
 
         private void TryTriggerVictoryIfSolved()
@@ -186,6 +168,30 @@ namespace UI.Game
 
             _progressService.Save();
             _screenNavigator.Show(ScreenId.Win);
+        }
+        
+        private void OnClusterDroppedHandler(int clusterId, int rowIndex, int colIndex)
+        {
+            if (_boardState == null)
+            {
+                return;
+            }
+
+            var move = _boardState.TryMoveCluster(clusterId, rowIndex, colIndex);
+            if (!move.Success)
+            {
+                var place = _boardState.TryPlaceCluster(clusterId, rowIndex, colIndex);
+                if (!place.Success)
+                {
+                    _view.ReturnClusterToPool(clusterId);
+                    return;
+                }
+            }
+
+            _view.AttachClusterToBoard(clusterId, rowIndex, colIndex);
+
+            RefreshGridFromBoardState();
+            TryTriggerVictoryIfSolved();
         }
     }
 }
