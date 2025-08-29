@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1997630293117120488}
   - component: {fileID: 310657541898860259}
   - component: {fileID: 4383833597291481203}
+  - component: {fileID: 2949306385786341221}
   m_Layer: 5
   m_Name: Cluster_1
   m_TagString: Untagged
@@ -147,6 +148,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 001bc5de9ba54eeabd4817834358cbac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.Game.ClusterDragHandler
+--- !u!114 &2949306385786341221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637343349964439135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec07e9a861e44fc7b8230d3c91e24f8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UI.Game.ClusterView
+  _image: {fileID: 6887938720395922011}
+  _defaultColor: {r: 0.8352941, g: 0.46666667, b: 0.9254902, a: 0.5176471}
+  _goodPlaceColor: {r: 0.33490568, g: 1, b: 0.3731853, a: 0.5176471}
+  _badPlaceColor: {r: 1, g: 0.2216981, b: 0.2216981, a: 0.5176471}
 --- !u!1 &6460094508015591939
 GameObject:
   m_ObjectHideFlags: 0
