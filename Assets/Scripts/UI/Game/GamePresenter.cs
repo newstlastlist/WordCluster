@@ -32,9 +32,9 @@ namespace UI.Game
 
         public void Open()
         {
-            _view.CellClicked += OnCellClicked;
-            _view.ClusterClicked += OnClusterClicked;
-            _view.DebugWinClicked += OnDebugWinClicked;
+            _view.OnCellClicked += OnCellClickedHandler;
+            _view.OnClusterClicked += OnClusterClickedHandler;
+            _view.OnDebugWinClicked += OnDebugWinClickedHandler;
 
             _currentLevelIndex = Math.Clamp(_progressService.LastCompletedLevelIndex + 1, 0, Math.Max(0, _levelRepository.Count - 1));
 
@@ -60,9 +60,9 @@ namespace UI.Game
 
         public void Close()
         {
-            _view.DebugWinClicked -= OnDebugWinClicked;
-            _view.CellClicked -= OnCellClicked;
-            _view.ClusterClicked -= OnClusterClicked;
+            _view.OnDebugWinClicked -= OnDebugWinClickedHandler;
+            _view.OnCellClicked -= OnCellClickedHandler;
+            _view.OnClusterClicked -= OnClusterClickedHandler;
 
             _selectedClusterId = null;
             _clusterTextById.Clear();
@@ -79,12 +79,12 @@ namespace UI.Game
             return _clusterTextById;
         }
 
-        private void OnDebugWinClicked()
+        private void OnDebugWinClickedHandler()
         {
             ForceWinForDebug();
         }
 
-        private void OnClusterClicked(int clusterId)
+        private void OnClusterClickedHandler(int clusterId)
         {
             if (_clusterTextById.ContainsKey(clusterId))
             {
@@ -92,7 +92,7 @@ namespace UI.Game
             }
         }
 
-        private void OnCellClicked(int rowIndex, int colIndex)
+        private void OnCellClickedHandler(int rowIndex, int colIndex)
         {
             if (_boardState == null || !_selectedClusterId.HasValue)
             {

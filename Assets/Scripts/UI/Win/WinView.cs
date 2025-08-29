@@ -12,19 +12,19 @@ namespace UI.Win
         [SerializeField] private Button _mainMenuButton;
         [SerializeField] private Button _nextLevelButton;
 
-        public event Action MainMenuClicked;
-        public event Action NextLevelClicked;
+        public event Action OnMainMenuClicked;
+        public event Action OnNextLevelClicked;
 
         private void Awake()
         {
             if (_mainMenuButton != null)
             {
-                _mainMenuButton.onClick.AddListener(OnMainMenuClickedInternal);
+                _mainMenuButton.onClick.AddListener(OnMainMenuClickedInternalHandler);
             }
 
             if (_nextLevelButton != null)
             {
-                _nextLevelButton.onClick.AddListener(OnNextLevelClickedInternal);
+                _nextLevelButton.onClick.AddListener(OnNextLevelClickedInternalHandler);
             }
         }
 
@@ -32,12 +32,12 @@ namespace UI.Win
         {
             if (_mainMenuButton != null)
             {
-                _mainMenuButton.onClick.RemoveListener(OnMainMenuClickedInternal);
+                _mainMenuButton.onClick.RemoveListener(OnMainMenuClickedInternalHandler);
             }
 
             if (_nextLevelButton != null)
             {
-                _nextLevelButton.onClick.RemoveListener(OnNextLevelClickedInternal);
+                _nextLevelButton.onClick.RemoveListener(OnNextLevelClickedInternalHandler);
             }
         }
 
@@ -54,14 +54,14 @@ namespace UI.Win
             return _wordsContainer;
         }
 
-        private void OnMainMenuClickedInternal()
+        private void OnMainMenuClickedInternalHandler()
         {
-            MainMenuClicked?.Invoke();
+            OnMainMenuClicked?.Invoke();
         }
 
-        private void OnNextLevelClickedInternal()
+        private void OnNextLevelClickedInternalHandler()
         {
-            NextLevelClicked?.Invoke();
+            OnNextLevelClicked?.Invoke();
         }
     }
 }

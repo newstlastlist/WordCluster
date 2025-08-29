@@ -6,7 +6,6 @@ namespace App
 {
     public sealed class ScreenController : MonoBehaviour
     {
-        [Header("Assign panels in inspector")]
         [SerializeField] private GameObject _mainMenuPanel;
         [SerializeField] private GameObject _gamePanel;
         [SerializeField] private GameObject _winPanel;

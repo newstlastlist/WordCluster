@@ -22,8 +22,8 @@ namespace UI.Win
 
         public void Open()
         {
-            _view.MainMenuClicked += OnMainMenuClicked;
-            _view.NextLevelClicked += OnNextLevelClicked;
+            _view.OnMainMenuClicked += OnMainMenuClickedHandler;
+            _view.OnNextLevelClicked += OnNextLevelClickedHandler;
 
             int completed = Math.Max(0, _progressService.LastCompletedLevelIndex + 1);
             int total = _levelRepository.Count;
@@ -36,16 +36,16 @@ namespace UI.Win
 
         public void Close()
         {
-            _view.MainMenuClicked -= OnMainMenuClicked;
-            _view.NextLevelClicked -= OnNextLevelClicked;
+            _view.OnMainMenuClicked -= OnMainMenuClickedHandler;
+            _view.OnNextLevelClicked -= OnNextLevelClickedHandler;
         }
 
-        private void OnMainMenuClicked()
+        private void OnMainMenuClickedHandler()
         {
             _screenNavigator.Show(ScreenId.Main);
         }
 
-        private void OnNextLevelClicked()
+        private void OnNextLevelClickedHandler()
         {
             _screenNavigator.Show(ScreenId.Game);
         }

@@ -11,13 +11,13 @@ namespace UI.MainMenu
         [SerializeField] private TMP_Text _progressText;
         [SerializeField] private Button _playButton;
         
-        public event Action PlayClicked;
+        public event Action OnPlayClicked;
 
         private void Awake()
         {
             if (_playButton != null)
             {
-                _playButton.onClick.AddListener(OnPlayClicked);
+                _playButton.onClick.AddListener(OnPlayClickedHandler);
             }
         }
 
@@ -25,7 +25,7 @@ namespace UI.MainMenu
         {
             if (_playButton != null)
             {
-                _playButton.onClick.RemoveListener(OnPlayClicked);
+                _playButton.onClick.RemoveListener(OnPlayClickedHandler);
             }
         }
 
@@ -45,9 +45,9 @@ namespace UI.MainMenu
             }
         }
 
-        private void OnPlayClicked()
+        private void OnPlayClickedHandler()
         {
-            PlayClicked?.Invoke();
+            OnPlayClicked?.Invoke();
         }
     }
 }

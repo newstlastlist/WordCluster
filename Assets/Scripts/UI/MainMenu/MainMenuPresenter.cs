@@ -22,7 +22,7 @@ namespace UI.MainMenu
 
         public void Open()
         {
-            _view.PlayClicked += OnPlayClicked;
+            _view.OnPlayClicked += OnPlayClickedHandler;
 
             _view.SetTitle("WORD PUZZLE");
             int completed = Math.Max(0, _progressService.LastCompletedLevelIndex + 1);
@@ -34,10 +34,10 @@ namespace UI.MainMenu
 
         public void Close()
         {
-            _view.PlayClicked -= OnPlayClicked;
+            _view.OnPlayClicked -= OnPlayClickedHandler;
         }
 
-        private void OnPlayClicked()
+        private void OnPlayClickedHandler()
         {
             _screenNavigator.Show(ScreenId.Game);
         }
