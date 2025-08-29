@@ -2,16 +2,37 @@
   "Levels": [
     {
       "Id": 1,
-      "Layout": { "Rows": 4, "WordLength": 6 },
-      "Words": ["КЛАССЫ", "АКТЁРЫ", "СКЛАДЫ", "РАМКИ"],
-      "Clusters": ["КЛ","АСС","Ы","АК","ТЁ","РЫ","СК","ЛА","ДЫ","РА","МК","И"],
+      "Layout": { "Rows": 1, "WordLength": 3 },
+      "Words": ["КОТ"],
+      "Clusters": ["КО", "Т"],
       "UiOptions": { "ShuffleClusters": true }
     },
     {
       "Id": 2,
-      "Layout": { "Rows": 4, "WordLength": 6 },
-      "Words": ["МОСТЫ","ЛАПША","ТОРТЫ","КРОВЬ"],
-      "Clusters": ["МО","СТЫ","ЛА","ПШ","А","ТО","РТ","Ы","КР","ОВ","Ь"],
+      "Layout": { "Rows": 3, "WordLength": 4 },
+      "Words": ["СУПЫ", "НОСЫ", "ЛУЖА"],
+      "Clusters": ["СУ", "ПЫ", "НО", "СЫ", "ЛУ", "ЖА"],
+      "UiOptions": { "ShuffleClusters": true }
+    },
+    {
+      "Id": 3,
+      "Layout": { "Rows": 4, "WordLength": 5 },
+      "Words": ["МОСТЫ", "ЛАПША", "ТОРТЫ", "КРОВЬ"],
+      "Clusters": ["МО", "СТЫ", "ЛА", "ПША", "ТО", "РТЫ", "КР", "ОВЬ"],
+      "UiOptions": { "ShuffleClusters": true }
+    },
+    {
+      "Id": 4,
+      "Layout": { "Rows": 5, "WordLength": 6 },
+      "Words": ["ЛЕСНИК", "ПЛИТКА", "РОБОТЫ", "КНИЖКА", "ФРУКТЫ"],
+      "Clusters": ["ЛЕС", "НИК", "ПЛИ", "ТКА", "РО", "БОТЫ", "КНИ", "ЖКА", "ФРУК", "ТЫ"],
+      "UiOptions": { "ShuffleClusters": true }
+    },
+    {
+      "Id": 5,
+      "Layout": { "Rows": 4, "WordLength": 8 },
+      "Words": ["КОМПЛЕКТ", "ПЕРЕМЕНЫ", "ТЕТРАДКА", "СНЕЖИНКИ"],
+      "Clusters": ["КОМП", "ЛЕКТ", "ПЕРЕ", "МЕНЫ", "ТЕТР", "АДКА", "СНЕЖ", "ИНКИ"],
       "UiOptions": { "ShuffleClusters": true }
     }
   ]
