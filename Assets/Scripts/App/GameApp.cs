@@ -35,6 +35,7 @@ namespace App
             _serviceRegistry.Register<ILevelRepository>(levelRepository);
             _serviceRegistry.Register<IProgressService>(progressService);
             _serviceRegistry.Register<IScreenNavigator>(new ScreenNavigator(_screenController));
+            _serviceRegistry.Register<ISolvedWordsOrderService>(new SolvedWordsOrderService());
 
             var mainMenuView = _screenController.GetViewOnPanel<MainMenuView>(ScreenId.Main);
             var gameView = _screenController.GetViewOnPanel<GameView>(ScreenId.Game);
