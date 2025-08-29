@@ -16,6 +16,7 @@ namespace UI.Game
         private RectTransform _lettersContainer;
         private float _cellWidth;
         private float _cellSpacing;
+        private bool _dropAcceptedOnce;
 
         public int ClusterId => _clusterId;
 
@@ -96,7 +97,15 @@ namespace UI.Game
         
         public void MarkDropAcceptedOnce()
         {
+            _dropAcceptedOnce = true;
             _skipReturnToOriginalParentOnce = true;
+        }
+        
+        public bool ConsumeDropAcceptedFlag()
+        {
+            bool v = _dropAcceptedOnce;
+            _dropAcceptedOnce = false;
+            return v;
         }
         
         public void SetLettersContainer(RectTransform lettersContainer)

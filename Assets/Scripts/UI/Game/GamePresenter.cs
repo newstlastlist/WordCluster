@@ -35,6 +35,7 @@ namespace UI.Game
         {
             _view.OnDebugWinClicked += OnDebugWinClickedHandler;
             _view.OnClusterDropped += OnClusterDroppedHandler;
+            _view.OnClusterDragEnded += OnClusterDragEndedHandler;
             
             _view.ResetForNewLevel();
 
@@ -70,6 +71,7 @@ namespace UI.Game
         {
             _view.OnDebugWinClicked -= OnDebugWinClickedHandler;
             _view.OnClusterDropped -= OnClusterDroppedHandler;
+            _view.OnClusterDragEnded -= OnClusterDragEndedHandler;
             
             _view.ClearAllVisuals();
         }
@@ -109,6 +111,28 @@ namespace UI.Game
         {
             ForceWinForDebugHandler();
         }
+        
+        private void OnClusterDragEndedHandler(int clusterId)
+        {
+            // Был ли дроп принят ячейкой? Если да — всё уже обработано в OnClusterDroppedHandler.
+            bool accepted = _view.ConsumeDropAcceptedFlag(clusterId);
+            if (accepted)
+            {
+                return;
+            }
+
+            // Драг завершился НЕ на ячейке: если кластер числится на поле — снимаем размещение.
+            if (_boardState != null)
+            {
+                _boardState.TryRemoveCluster(clusterId);
+            }
+            _placedClusterIds.Remove(clusterId);
+
+            // Визуал на всякий случай (если уже в ленте — просто нормализуем состояние)
+            _view.ReturnClusterToPool(clusterId);
+            _view.SetClusterLocked(clusterId, false);
+            _view.SetClusterFrameState(clusterId, ClusterView.FrameState.Default);
+        }
 
         private void OnClusterDroppedHandler(int clusterId, int rowIndex, int colIndex)
         {
@@ -117,29 +141,31 @@ namespace UI.Game
                 return;
             }
 
-            // если кластер уже был на поле — пробуем переместить; иначе — положить
             var move = _boardState.TryMoveCluster(clusterId, rowIndex, colIndex);
             if (!move.Success)
             {
                 var place = _boardState.TryPlaceCluster(clusterId, rowIndex, colIndex);
                 if (!place.Success)
                 {
-                    // невалидный дроп → возвращаем визуал в ленту
+                    // дроп БЫЛ на ячейку, но позиция невалидна → вернуть в ленту и гарантированно снять размещение
                     _view.ReturnClusterToPool(clusterId);
+
+                    _boardState.TryRemoveCluster(clusterId);   // всегда пробуем удалить
+                    _placedClusterIds.Remove(clusterId);
+
+                    _view.SetClusterLocked(clusterId, false);
+                    _view.SetClusterFrameState(clusterId, ClusterView.FrameState.Default);
                     return;
                 }
 
                 _placedClusterIds.Add(clusterId);
-                _view.SetClusterInteractable(clusterId, false); // по желанию — блокируем клик из ленты
+                _view.SetClusterInteractable(clusterId, false);
             }
 
-            // визуал: рамка переезжает на BoardOverlay
             _view.AttachClusterToBoard(clusterId, rowIndex, colIndex);
 
             CheckCompletedRowsAndLockHandler();
-
             SyncSolvedWordsOrderHandler();
-
             TryTriggerVictoryIfSolvedHandler();
         }
         

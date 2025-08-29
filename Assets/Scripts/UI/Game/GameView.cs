@@ -355,18 +355,27 @@ namespace UI.Game
             ClearBoardOverlayInternal();
         }
         
+        public bool ConsumeDropAcceptedFlag(int clusterId)
+        {
+            if (_clusterMap.TryGetValue(clusterId, out var tuple) && tuple.drag != null)
+            {
+                return tuple.drag.ConsumeDropAcceptedFlag();
+            }
+
+            return false;
+        }
+        
         private void ClearBoardOverlayInternal()
         {
-            // уничтожаем инстансы рамок
+            // Удаляем все инстансы рамок, прикреплённых к полю
             foreach (var kvp in _clusterFrames)
             {
-                RectTransform frame = kvp.Value.frame;
+                var frame = kvp.Value.frame;
                 if (frame != null)
                 {
                     Destroy(frame.gameObject);
                 }
             }
-
             _clusterFrames.Clear();
             _clusterOnBoard.Clear();
         }
@@ -414,49 +423,55 @@ namespace UI.Game
             {
                 for (int i = _gridContainer.childCount - 1; i >= 0; i--)
                 {
-                    Destroy(_gridContainer.GetChild(i).gameObject);
+                    var child = _gridContainer.GetChild(i);
+                    if (child != null)
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
             }
         }
 
         private void ClearClustersInternal()
         {
+            // 1) безопасная отписка
             foreach (var pair in _clusterMap)
             {
-                int clusterId = pair.Key;
-
-                Button btn = pair.Value.button;
+                var btn = pair.Value.button;
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
                 }
 
-                ClusterDragHandler drag = pair.Value.drag;
+                var drag = pair.Value.drag;
+                int id = pair.Key;
                 if (drag != null)
                 {
-                    if (_draggedHandlers.TryGetValue(clusterId, out var onDragged))
+                    if (_draggedHandlers.TryGetValue(id, out var onDragged))
                     {
                         drag.OnDragged -= onDragged;
                     }
-
-                    if (_dragEndedHandlers.TryGetValue(clusterId, out var onDragEnded))
+                    if (_dragEndedHandlers.TryGetValue(id, out var onDragEnded))
                     {
                         drag.OnDragEnded -= onDragEnded;
                     }
                 }
             }
 
+            _clusterMap.Clear();
             _draggedHandlers.Clear();
             _dragEndedHandlers.Clear();
-            _clusterMap.Clear();
-            _clusterFrames.Clear();
-            _clusterOnBoard.Clear();
 
+            // 2) ЖЁСТКО удалить всех детей контента
             if (_clustersContent != null)
             {
                 for (int i = _clustersContent.childCount - 1; i >= 0; i--)
                 {
-                    Destroy(_clustersContent.GetChild(i).gameObject);
+                    var child = _clustersContent.GetChild(i);
+                    if (child != null)
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
             }
         }
