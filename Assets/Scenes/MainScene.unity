@@ -904,82 +904,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Game
       objectReference: {fileID: 0}
-    - target: {fileID: 4126250528762748648, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4126250528762748648, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4126250528762748648, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4126250528762748648, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -17
-      objectReference: {fileID: 0}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[1].ClusterPrefab
-      value: 
-      objectReference: {fileID: 8684869514244338440, guid: 131406a55cd54dc42848c0ef89ffba77, type: 3}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[2].ClusterPrefab
-      value: 
-      objectReference: {fileID: 3024814545116754981, guid: 0db32b32046944147ac0a5319b2fc10e, type: 3}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[3].ClusterPrefab
-      value: 
-      objectReference: {fileID: 1314737707599590912, guid: 72915fa77bcdecd4ca1c84e9393763fc, type: 3}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[1].ClusterTextLength
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[2].ClusterTextLength
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6481259397544207925, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: _clusterPrefabs.Array.data[3].ClusterTextLength
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968722929962896687, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6968722929962896687, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8058920721882331835, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8058920721882331835, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8399895346871844473, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8399895346871844473, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: -17
-      objectReference: {fileID: 0}
-    - target: {fileID: 8864412223320944460, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 8044858433815782283, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
-    - {fileID: 444293067098096595, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9012efc2cdaf8dd4393400910614e0ce, type: 3}
