@@ -1,5 +1,40 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &604818305071826382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7210889506209279377}
+  m_Layer: 5
+  m_Name: BoardOvelay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7210889506209279377
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604818305071826382}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1632738204574318890}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 80, y: -305.8}
+  m_SizeDelta: {x: -130, y: 1047.7}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &3057603313648318495
 GameObject:
   m_ObjectHideFlags: 0
@@ -18,7 +53,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1632738204574318890
 RectTransform:
   m_ObjectHideFlags: 0
@@ -33,6 +68,8 @@ RectTransform:
   m_Children:
   - {fileID: 3806590193018476669}
   - {fileID: 8590623145771106465}
+  - {fileID: 948937126298600081}
+  - {fileID: 7210889506209279377}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -90,8 +127,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891cb7ffc7064fc490e63245b7c5bacf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.Game.GameView
-  _header: {fileID: 6149367459919659576}
-  _debugWinButton: {fileID: 1872950800885329701}
+  _headerText: {fileID: 6149367459919659576}
+  _gridContainer: {fileID: 948937126298600081}
+  _gridLayout: {fileID: 3783860141217780758}
+  _cellButtonPrefab: {fileID: 3405772905229113105, guid: 8badffef5683ba2498804b8696b6da79, type: 3}
+  _cellSize: {x: 100, y: 100}
+  _cellSpacing: {x: 10, y: 10}
+  _gridPadding: {x: 5, y: 5}
+  _clustersContent: {fileID: 0}
+  _clusterPrefabs:
+  - ClusterTextLength: 1
+    ClusterPrefab: {fileID: 637343349964439135, guid: 96b8d0d69a183c8429353e1c25afe653, type: 3}
+  _letterItemPrefab: {fileID: 3040212096846436935, guid: f207bc9a8d8acc54ea1afb6e06a74101, type: 3}
+  _boardOverlay: {fileID: 7210889506209279377}
+  _debugButton: {fileID: 1872950800885329701}
 --- !u!1 &6427931323694321964
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,6 +277,66 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &7509587955233921724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 948937126298600081}
+  - component: {fileID: 3783860141217780758}
+  m_Layer: 5
+  m_Name: GridContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &948937126298600081
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7509587955233921724}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1632738204574318890}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 80, y: -305.8}
+  m_SizeDelta: {x: -130, y: 1047.7}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &3783860141217780758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7509587955233921724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 100, y: 100}
+  m_Spacing: {x: 10, y: 10}
+  m_Constraint: 1
+  m_ConstraintCount: 6
 --- !u!1 &7809228968103826330
 GameObject:
   m_ObjectHideFlags: 0
