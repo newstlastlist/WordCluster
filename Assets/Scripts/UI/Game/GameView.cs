@@ -53,11 +53,11 @@ namespace UI.Game
         public int RowsCount { get; private set; }
         public int WordLength { get; private set; }
 
-        public event Action<int, int> OnCellClicked;                  // row, col
-        public event Action<int> OnClusterClicked;                    // clusterId
-        public event Action<int, int, int> OnClusterDropped;          // clusterId, row, col
-        public event Action<int> OnClusterDragStarted;                // clusterId
-        public event Action<int> OnClusterDragEnded;                  // clusterId
+        public event Action<int, int> OnCellClicked; // row, col
+        public event Action<int> OnClusterClicked; // clusterId
+        public event Action<int, int, int> OnClusterDropped;// clusterId, row, col
+        public event Action<int> OnClusterDragStarted;// clusterId
+        public event Action<int> OnClusterDragEnded; // clusterId
         public event Action OnDebugWinClicked;
 
         private void Awake()
@@ -367,7 +367,6 @@ namespace UI.Game
         
         private void ClearBoardOverlayInternal()
         {
-            // Удаляем все инстансы рамок, прикреплённых к полю
             foreach (var kvp in _clusterFrames)
             {
                 var frame = kvp.Value.frame;
@@ -462,7 +461,6 @@ namespace UI.Game
             _draggedHandlers.Clear();
             _dragEndedHandlers.Clear();
 
-            // 2) ЖЁСТКО удалить всех детей контента
             if (_clustersContent != null)
             {
                 for (int i = _clustersContent.childCount - 1; i >= 0; i--)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using App;
 using Domain;
 using Infrastructure;
@@ -62,9 +63,14 @@ namespace UI.Game
             BuildDomainForLevelHandler(levelData);
 
             _view.BuildGrid(_boardState.RowsCount, _boardState.WordLength);
-            _view.RenderClusters(_clusterTextById);
-            _view.ClearAllCells(); // буквы не рисуем в ячейки — визуал только рамками
             
+            bool shuffle = levelData.UiOptions.ShuffleClusters;
+            var dictToRender = shuffle
+                ? GetShuffledClustersTextById(_clusterTextById)
+                : (IReadOnlyDictionary<int, string>)_clusterTextById;
+
+            _view.RenderClusters(dictToRender);
+            _view.ClearAllCells(); // буквы не рисуем в ячейки — визуал только рамками
         }
 
         public void Close()
@@ -74,6 +80,25 @@ namespace UI.Game
             _view.OnClusterDragEnded -= OnClusterDragEndedHandler;
             
             _view.ClearAllVisuals();
+        }
+        
+        private IReadOnlyDictionary<int, string> GetShuffledClustersTextById(
+            Dictionary<int, string> source)
+        {
+            var list = new List<KeyValuePair<int, string>>(source);
+
+            list = new List<KeyValuePair<int, string>>(
+                list.OrderBy(_ => UnityEngine.Random.value)
+            );
+
+            var result = new Dictionary<int, string>(list.Count);
+            for (int i = 0; i < list.Count; i++)
+            {
+                var kv = list[i];
+                result[kv.Key] = kv.Value;
+            }
+
+            return result;
         }
 
         private void BuildDomainForLevelHandler(LevelData level)
